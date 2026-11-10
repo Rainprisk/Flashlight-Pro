@@ -1,546 +1,368 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-950 text-slate-100">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Flashlight Pro Max - Aplikasi Senter Premium</title>
-  <!-- Tailwind CSS CDN -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Kalkulator Pro - Hitung Cepat & Akurat</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#fffbe6',
-              400: '#facc15',
-              500: '#eab308',
-              600: '#ca8a04',
-              900: '#713f12',
-            }
-          },
-          animation: {
-            'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'glow': 'glow 2s ease-in-out infinite alternate',
-          },
-          keyframes: {
-            glow: {
-              '0%': { boxShadow: '0 0 15px rgba(234, 179, 8, 0.3)' },
-              '100%': { boxShadow: '0 0 35px rgba(234, 179, 8, 0.8)' }
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    /* Custom Styles for Flashlight Canvas & Screen Torch Overlay */
-    .screen-torch-overlay {
-      transition: opacity 0.2s ease-in-out;
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0f172a;
+      touch-action: manipulation;
     }
-    .power-btn-shadow {
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+    .font-mono-num {
+      font-family: 'JetBrains+Mono', monospace;
     }
-    .power-btn-active {
-      box-shadow: 0 0 50px rgba(234, 179, 8, 0.6), inset 0 2px 8px rgba(255, 255, 255, 0.4);
+    .btn-calc {
+      transition: all 0.15s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-calc:active {
+      transform: scale(0.92);
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+      50% { box-shadow: 0 0 35px rgba(99, 102, 241, 0.6); }
+    }
+    .glow-effect {
+      animation: pulse-glow 3s infinite;
     }
   </style>
 </head>
-<body class="h-full flex flex-col justify-between overflow-hidden select-none bg-slate-950 font-sans antialiased text-slate-200">
+<body class="min-h-screen text-slate-100 flex flex-col justify-between items-center p-4">
 
-  <!-- Screen Flashlight Fallback Overlay -->
-  <div id="screenTorchOverlay" class="screen-torch-overlay fixed inset-0 bg-white z-50 pointer-events-none opacity-0 flex flex-col items-center justify-center">
-    <button id="closeOverlayBtn" class="pointer-events-auto absolute top-6 right-6 p-3 bg-slate-900/40 text-slate-800 rounded-full font-bold text-sm backdrop-blur">
-      <i data-lucide="x" class="w-6 h-6"></i>
-    </button>
-    <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mt-auto mb-8 pointer-events-none">Layar Flashlight Fallback Aktif</p>
-  </div>
-
-  <!-- Header App Bar -->
-  <header class="w-full max-w-md mx-auto pt-6 px-6 flex items-center justify-between z-10">
+  <!-- Header / Navbar -->
+  <header class="w-full max-w-sm flex items-center justify-between pt-2 pb-4">
     <div class="flex items-center gap-2">
-      <div class="p-2 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 font-black shadow-lg">
-        <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+      <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/30">
+        <i class="fa-solid font-mono-num text-white">=</i>
       </div>
       <div>
-        <h1 class="font-extrabold text-base tracking-wide text-white leading-tight">LUMEN <span class="text-amber-400">PRO</span></h1>
-        <p class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Ultra Torch v2.4</p>
+        <h1 class="font-bold text-base tracking-tight leading-none text-white">CalcPro <span class="text-xs bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded border border-indigo-500/30 font-normal">v2.4</span></h1>
+        <p class="text-[10px] text-slate-400 mt-0.5">Kalkulator Presisi Tinggi</p>
       </div>
     </div>
-
-    <!-- Status VIP Badge -->
-    <div id="vipBadge" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-800/80 border border-slate-700 text-slate-400">
-      <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-      <span id="vipBadgeText">FREE TIER</span>
-    </div>
+    <span id="vip-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-slate-500"></span> Gratis
+    </span>
   </header>
 
-  <!-- Main Flashlight Interface -->
-  <main class="w-full max-w-md mx-auto flex-1 flex flex-col items-center justify-between p-6 z-10">
-
-    <!-- Counter Limit Usage Indicator -->
-    <div id="usageTrackerCard" class="w-full bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 backdrop-blur text-center transition-all">
-      <div class="flex justify-between items-center mb-1.5 text-xs text-slate-400 font-medium">
-        <span>Sisa Kuota Gratis</span>
-        <span id="usageText" class="font-bold text-amber-400">2 dari 3 kali</span>
+  <!-- Main Calculator Card -->
+  <main class="w-full max-w-sm glass-card rounded-3xl p-5 shadow-2xl flex flex-col gap-4 relative overflow-hidden">
+    
+    <!-- Display Section -->
+    <div class="bg-slate-900/90 rounded-2xl p-4 flex flex-col justify-between min-h-[120px] border border-slate-800 shadow-inner">
+      <div class="flex justify-between items-center text-xs text-slate-400 font-mono-num">
+        <span id="limit-counter" class="text-amber-400/90 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+          Sisa Gratis: <strong id="uses-left">3</strong>x
+        </span>
+        <span id="history-text" class="truncate max-w-[180px] text-right text-slate-400"></span>
       </div>
-      <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-        <div id="usageProgressBar" class="h-full bg-gradient-to-r from-amber-500 to-yellow-400 w-2/3 transition-all duration-300"></div>
-      </div>
-      <p id="usageNote" class="text-[11px] text-slate-500 mt-2">Dapatkan akses tanpa batas dengan VIP Lifetime.</p>
-    </div>
-
-    <!-- Central Interactive Torch Button -->
-    <div class="relative my-auto flex items-center justify-center">
-      <!-- Glow Ring Background -->
-      <div id="glowRing" class="absolute inset-0 rounded-full bg-amber-400/20 blur-2xl scale-125 opacity-0 transition-opacity duration-500"></div>
-
-      <!-- Outer Ring -->
-      <div class="w-56 h-56 sm:w-64 sm:h-64 rounded-full p-3 bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700/50 shadow-2xl flex items-center justify-center">
-        <!-- Inner Power Button -->
-        <button id="powerBtn" class="w-full h-full rounded-full bg-gradient-to-b from-slate-800 to-slate-950 border-4 border-slate-700/60 flex flex-col items-center justify-center gap-3 transition-all duration-300 active:scale-95 power-btn-shadow group">
-          <div id="powerIconWrapper" class="p-4 rounded-full bg-slate-800 text-slate-500 transition-all duration-300 group-hover:text-slate-300">
-            <i data-lucide="power" class="w-12 h-12 stroke-[2.5]"></i>
-          </div>
-          <span id="powerStatusText" class="text-xs font-bold tracking-widest text-slate-400 uppercase">MATI</span>
-        </button>
+      <div class="text-right overflow-x-auto whitespace-nowrap scrollbar-none py-1">
+        <span id="display-text" class="font-mono-num text-4xl font-bold tracking-tight text-white">0</span>
       </div>
     </div>
 
-    <!-- Brightness Controller Section -->
-    <div class="w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur">
-      <div class="flex justify-between items-center mb-3">
-        <label for="brightnessSlider" class="text-xs font-semibold text-slate-300 flex items-center gap-2">
-          <i data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
-          Tingkat Kecerahan
-        </label>
-        <span id="brightnessValueText" class="text-xs font-bold text-amber-400 px-2 py-0.5 rounded bg-amber-400/10 border border-amber-400/20">Level 1 (Basic)</span>
-      </div>
+    <!-- Keypad Grid -->
+    <div class="grid grid-cols-4 gap-2.5">
+      <!-- Row 1 -->
+      <button onclick="clearDisplay()" class="btn-calc bg-slate-800 hover:bg-slate-700 text-rose-400 font-semibold text-lg py-4 rounded-2xl flex items-center justify-center">AC</button>
+      <button onclick="deleteLast()" class="btn-calc bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-lg py-4 rounded-2xl flex items-center justify-center">
+        <i class="fa-solid fa-backspace"></i>
+      </button>
+      <button onclick="triggerPaywallFeature('Persen (%)')" class="btn-calc bg-slate-800 hover:bg-slate-700 text-indigo-400 font-semibold text-lg py-4 rounded-2xl flex items-center justify-center relative">
+        %
+        <i class="fa-solid fa-crown text-[10px] text-amber-400 absolute top-2 right-2"></i>
+      </button>
+      <button onclick="appendOperator('/')" class="btn-calc bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-300 font-bold text-xl py-4 rounded-2xl flex items-center justify-center border border-indigo-500/30">÷</button>
 
-      <!-- Brightness Slider -->
-      <div class="relative flex items-center">
-        <input type="range" id="brightnessSlider" min="1" max="5" value="1" step="1" 
-          class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400 focus:outline-none">
-      </div>
+      <!-- Row 2 -->
+      <button onclick="appendNum('7')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">7</button>
+      <button onclick="appendNum('8')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">8</button>
+      <button onclick="appendNum('9')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">9</button>
+      <button onclick="appendOperator('*')" class="btn-calc bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-300 font-bold text-xl py-4 rounded-2xl flex items-center justify-center border border-indigo-500/30">×</button>
 
-      <div class="flex justify-between text-[10px] text-slate-500 font-semibold mt-2 px-1">
-        <span>LVL 1</span>
-        <span>LVL 2 🔒</span>
-        <span>LVL 3 🔒</span>
-        <span>LVL 4 🔒</span>
-        <span>MAX 🔒</span>
-      </div>
+      <!-- Row 3 -->
+      <button onclick="appendNum('4')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">4</button>
+      <button onclick="appendNum('5')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">5</button>
+      <button onclick="appendNum('6')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">6</button>
+      <button onclick="appendOperator('-')" class="btn-calc bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-300 font-bold text-xl py-4 rounded-2xl flex items-center justify-center border border-indigo-500/30">−</button>
+
+      <!-- Row 4 -->
+      <button onclick="appendNum('1')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">1</button>
+      <button onclick="appendNum('2')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">2</button>
+      <button onclick="appendNum('3')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">3</button>
+      <button onclick="appendOperator('+')" class="btn-calc bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-300 font-bold text-xl py-4 rounded-2xl flex items-center justify-center border border-indigo-500/30">+</button>
+
+      <!-- Row 5 -->
+      <button onclick="triggerPaywallFeature('Minus (+/-)')" class="btn-calc bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-lg py-4 rounded-2xl flex items-center justify-center relative">
+        +/−
+        <i class="fa-solid fa-crown text-[10px] text-amber-400 absolute top-2 right-2"></i>
+      </button>
+      <button onclick="appendNum('0')" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">0</button>
+      <button onclick="appendDot()" class="btn-calc bg-slate-800/80 hover:bg-slate-700 text-white font-semibold text-xl py-4 rounded-2xl">.</button>
+      <button onclick="calculateResult()" class="btn-calc bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-2xl py-4 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-600/40">=</button>
     </div>
 
+    <!-- Upgrade Banner Small -->
+    <div onclick="openModal()" class="mt-1 bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 border border-amber-500/20 rounded-2xl p-3 flex items-center justify-between cursor-pointer hover:border-amber-500/40 transition">
+      <div class="flex items-center gap-2.5">
+        <i class="fa-solid fa-crown text-amber-400 text-base"></i>
+        <div>
+          <p class="text-xs font-bold text-amber-200">Kalkulator Pro VIP</p>
+          <p class="text-[10px] text-slate-400">Buka Akses Tanpa Batas Hitung</p>
+        </div>
+      </div>
+      <span class="text-xs font-bold text-amber-400 bg-amber-500/20 px-2 py-1 rounded-lg">Rp 100rb</span>
+    </div>
   </main>
 
-  <!-- Footer Info -->
-  <footer class="w-full max-w-md mx-auto pb-6 px-6 text-center z-10">
-    <p class="text-[11px] text-slate-500">
-      Menggunakan Web Device Torch API. Jika perangkat tidak mendukung, mode simulasi layar akan aktif.
-    </p>
+  <!-- Footer -->
+  <footer class="w-full max-w-sm text-center py-2 text-xs text-slate-500">
+    CalcPro &copy; 2026 • Premium Calculator Web Edition
   </footer>
 
-  <!-- ==================== MODAL PAYWALL (RP 100.000) ==================== -->
-  <div id="paywallModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 opacity-0 pointer-events-none transition-all duration-300">
-    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl transform translate-y-full sm:translate-y-0 transition-transform duration-300 relative overflow-hidden">
+  <!-- Paywall Modal -->
+  <div id="paywall-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden opacity-0 transition-opacity duration-300">
+    <div class="glass-card max-w-sm w-full rounded-3xl p-6 border border-amber-500/30 shadow-2xl relative flex flex-col items-center text-center">
       
-      <!-- Top Decorative Glow -->
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl pointer-events-none"></div>
-
-      <!-- Close Modal Button -->
-      <button id="closeModalBtn" class="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-full bg-slate-800/50">
-        <i data-lucide="x" class="w-5 h-5"></i>
+      <!-- Close Button -->
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white w-8 h-8 rounded-full bg-slate-800/80 flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <!-- Header Icon & Title -->
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 bg-gradient-to-tr from-amber-500 to-yellow-300 rounded-2xl mx-auto flex items-center justify-center text-slate-950 shadow-lg shadow-amber-500/20 mb-4 animate-bounce">
-          <i data-lucide="crown" class="w-8 h-8 stroke-[2.5]"></i>
-        </div>
-        <h2 id="modalTitle" class="text-xl font-extrabold text-white">Senter Terkunci!</h2>
-        <p id="modalDescription" class="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-          Batas gratis pemakaian senter kamu telah habis. Tingkatkan ke VIP Premium untuk akses tanpa batas.
-        </p>
+      <!-- Crown Badge -->
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-3xl shadow-xl shadow-amber-500/20 mb-4 text-slate-950 glow-effect">
+        <i class="fa-solid fa-crown"></i>
       </div>
 
-      <!-- Pricing Card -->
-      <div class="bg-gradient-to-b from-slate-800/80 to-slate-950/80 border border-amber-500/30 rounded-2xl p-4 mb-6 text-center relative">
-        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black text-[10px] tracking-wider uppercase px-3 py-0.5 rounded-full shadow">
-          PENAWARAN SPESIAL LINETIME
-        </span>
-        <div class="mt-2 flex items-baseline justify-center gap-1">
-          <span class="text-sm font-semibold text-slate-400">Rp</span>
-          <span class="text-3xl font-black text-white">100.000</span>
-          <span class="text-xs text-slate-500 font-medium">/ seumur hidup</span>
+      <h2 class="text-2xl font-extrabold text-white">Batas Gratis Habis!</h2>
+      <p id="modal-desc" class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+        Kamu telah mencapai batas <strong class="text-amber-400">3 kali penghitungan gratis</strong>. Tingkatkan ke CalcPro VIP untuk membuka semua fitur.
+      </p>
+
+      <!-- Benefits List -->
+      <div class="w-full bg-slate-900/80 rounded-2xl p-3.5 my-4 text-left border border-slate-800 space-y-2 text-xs">
+        <div class="flex items-center gap-2.5 text-slate-200">
+          <i class="fa-solid fa-check text-emerald-400"></i>
+          <span>Penghitungan Tanpa Batas (Unlimited)</span>
         </div>
-        <p class="text-[11px] text-amber-400/90 mt-1 font-medium">Sekali bayar, nyala sepuasnya tanpa batas!</p>
+        <div class="flex items-center gap-2.5 text-slate-200">
+          <i class="fa-solid fa-check text-emerald-400"></i>
+          <span>Fitur Persen (%) & Negatif (+/−)</span>
+        </div>
+        <div class="flex items-center gap-2.5 text-slate-200">
+          <i class="fa-solid fa-check text-emerald-400"></i>
+          <span>Bebas Iklan & Akses Seumur Hidup</span>
+        </div>
       </div>
 
-      <!-- Premium Features List -->
-      <ul class="space-y-2.5 mb-6 text-xs text-slate-300">
-        <li class="flex items-center gap-2.5">
-          <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400 shrink-0"></i>
-          <span>Akses Senter Tanpa Batas (Unlimited Turns)</span>
-        </li>
-        <li class="flex items-center gap-2.5">
-          <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400 shrink-0"></i>
-          <span>Buka Fitur Kecerahan Super Terang (Level 2 - MAX)</span>
-        </li>
-        <li class="flex items-center gap-2.5">
-          <i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400 shrink-0"></i>
-          <span>Bebas Iklan & Tanpa Delay Senter</span>
-        </li>
-      </ul>
+      <!-- Price -->
+      <div class="mb-5">
+        <span class="text-xs text-slate-400 block mb-0.5">Sekali Bayar Akses Selamanya</span>
+        <span class="text-3xl font-black text-amber-400">Rp 100.000</span>
+      </div>
 
       <!-- Action Button -->
-      <button id="buyVipBtn" class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-        <i data-lucide="sparkles" class="w-5 h-5 fill-current"></i>
-        <span>BELI VIP PREMIUM - RP 100.000</span>
+      <button id="pay-btn" onclick="processPayment()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-amber-500/25 transition flex items-center justify-center gap-2">
+        <i class="fa-solid fa-bolt"></i> Bayar Sekarang (Simulasi)
       </button>
 
-      <p class="text-[10px] text-center text-slate-500 mt-3">Garansi kepuasan senter paling terang 100%.</p>
+      <p class="text-[10px] text-slate-400 mt-3">Pembayaran simulasi instant tanpa biaya riil.</p>
     </div>
   </div>
 
-  <!-- ==================== MODAL SIMULASI PEMBAYARAN ==================== -->
-  <div id="paymentModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
-    <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-2xl relative">
-      
-      <!-- Loading State -->
-      <div id="paymentLoadingState" class="py-8 flex flex-col items-center justify-center">
-        <div class="w-16 h-16 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <h3 class="text-base font-bold text-white">Memproses Pembayaran...</h3>
-        <p class="text-xs text-slate-400 mt-1">Menghubungkan ke Gateway QRIS Rp 100.000</p>
-      </div>
-
-      <!-- Success State (Hidden initially) -->
-      <div id="paymentSuccessState" class="hidden py-4 flex flex-col items-center justify-center">
-        <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-4 border border-emerald-500/40 animate-bounce">
-          <i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>
-        </div>
-        <h3 class="text-lg font-black text-white">Pembayaran Berhasil!</h3>
-        <p class="text-xs text-slate-300 mt-1">Selamat! Kamu telah menjadi Pengguna VIP Premium Senter seumur hidup.</p>
-
-        <div class="w-full bg-slate-800/80 rounded-xl p-3 my-4 text-xs text-left text-slate-400 space-y-1">
-          <div class="flex justify-between"><span>Nominal:</span><span class="text-white font-bold">Rp 100.000</span></div>
-          <div class="flex justify-between"><span>Status:</span><span class="text-emerald-400 font-bold">LUNAS</span></div>
-          <div class="flex justify-between"><span>Item:</span><span class="text-white font-bold">Senter VIP Lifetime</span></div>
-        </div>
-
-        <button id="finishPaymentBtn" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl shadow-lg transition-all">
-          Mulai Gunakan Senter VIP
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700 text-slate-200 text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300">
-    <i id="toastIcon" data-lucide="info" class="w-4 h-4 text-amber-400"></i>
-    <span id="toastMessage">Pesan Toast</span>
-  </div>
-
-  <!-- JavaScript Logic -->
   <script>
-    // State Management
-    let isTorchOn = false;
-    let isVipUnlocked = false;
-    let toggleCount = 0;
-    const MAX_FREE_TOGGLES = 2; // Maksimal 2 kali nyala gratis, ke-3 langsung paywall
+    let isVip = false;
+    let calculationCount = 0;
+    const MAX_FREE_CALCS = 3;
 
-    // Hardware Torch Track variable
-    let mediaStream = null;
-    let imageCaptureTrack = null;
-    let isHardwareTorchSupported = false;
+    let currentInput = '0';
+    let previousInput = '';
+    let operator = null;
+    let shouldResetDisplay = false;
 
-    // DOM Elements
-    const powerBtn = document.getElementById('powerBtn');
-    const powerIconWrapper = document.getElementById('powerIconWrapper');
-    const powerStatusText = document.getElementById('powerStatusText');
-    const glowRing = document.getElementById('glowRing');
-    const screenTorchOverlay = document.getElementById('screenTorchOverlay');
-    const closeOverlayBtn = document.getElementById('closeOverlayBtn');
-    const brightnessSlider = document.getElementById('brightnessSlider');
-    const brightnessValueText = document.getElementById('brightnessValueText');
-    const usageText = document.getElementById('usageText');
-    const usageProgressBar = document.getElementById('usageProgressBar');
-    const usageNote = document.getElementById('usageNote');
-    const usageTrackerCard = document.getElementById('usageTrackerCard');
-    const vipBadge = document.getElementById('vipBadge');
-    const vipBadgeText = document.getElementById('vipBadgeText');
+    const display = document.getElementById('display-text');
+    const history = document.getElementById('history-text');
+    const usesLeftDisplay = document.getElementById('uses-left');
+    const modal = document.getElementById('paywall-modal');
+    const modalDesc = document.getElementById('modal-desc');
 
-    // Modals & Toast
-    const paywallModal = document.getElementById('paywallModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDescription = document.getElementById('modalDescription');
-    const buyVipBtn = document.getElementById('buyVipBtn');
-    
-    const paymentModal = document.getElementById('paymentModal');
-    const paymentLoadingState = document.getElementById('paymentLoadingState');
-    const paymentSuccessState = document.getElementById('paymentSuccessState');
-    const finishPaymentBtn = document.getElementById('finishPaymentBtn');
+    function updateDisplay() {
+      display.innerText = currentInput;
+    }
 
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
+    function appendNum(num) {
+      if (currentInput === '0' || shouldResetDisplay) {
+        currentInput = num;
+        shouldResetDisplay = false;
+      } else {
+        if (currentInput.length < 12) {
+          currentInput += num;
+        }
+      }
+      updateDisplay();
+    }
 
-    // Initialize Lucide Icons
-    lucide.createIcons();
+    function appendDot() {
+      if (shouldResetDisplay) {
+        currentInput = '0.';
+        shouldResetDisplay = false;
+      } else if (!currentInput.includes('.')) {
+        currentInput += '.';
+      }
+      updateDisplay();
+    }
 
-    // Init Camera / Torch Capabilities
-    async function initCameraTorch() {
-      if (!('mediaDevices' in navigator) || !('getUserMedia' in navigator.mediaDevices)) {
-        console.log('MediaDevices API not supported, using screen fallback');
+    function appendOperator(op) {
+      if (operator !== null && !shouldResetDisplay) {
+        calculateResult(true);
+      }
+      previousInput = currentInput;
+      operator = op;
+      shouldResetDisplay = true;
+
+      let opSymbol = op;
+      if (op === '*') opSymbol = '×';
+      if (op === '/') opSymbol = '÷';
+      if (op === '-') opSymbol = '−';
+
+      history.innerText = `${previousInput} ${opSymbol}`;
+    }
+
+    function clearDisplay() {
+      currentInput = '0';
+      previousInput = '';
+      operator = null;
+      history.innerText = '';
+      updateDisplay();
+    }
+
+    function deleteLast() {
+      if (shouldResetDisplay) return;
+      if (currentInput.length === 1) {
+        currentInput = '0';
+      } else {
+        currentInput = currentInput.slice(0, -1);
+      }
+      updateDisplay();
+    }
+
+    function calculateResult(isChain = false) {
+      if (!operator || shouldResetDisplay) return;
+
+      // Check VIP limit
+      if (!isVip && calculationCount >= MAX_FREE_CALCS) {
+        triggerPaywall('Limit 3x hitungan gratis telah habis.');
         return;
       }
 
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' }
-        });
-        mediaStream = stream;
-        const track = stream.getVideoTracks()[0];
-        const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+      let result;
+      const prev = parseFloat(previousInput);
+      const current = parseFloat(currentInput);
 
-        if (capabilities.torch) {
-          imageCaptureTrack = track;
-          isHardwareTorchSupported = true;
-          console.log('Hardware Torch/Flashlight supported!');
-        } else {
-          console.log('Torch capability not present on camera track, using screen fallback.');
+      if (isNaN(prev) || isNaN(current)) return;
+
+      switch (operator) {
+        case '+': result = prev + current; break;
+        case '-': result = prev - current; break;
+        case '*': result = prev * current; break;
+        case '/': 
+          result = current === 0 ? 'Error' : prev / current; 
+          break;
+        default: return;
+      }
+
+      let opSymbol = operator;
+      if (operator === '*') opSymbol = '×';
+      if (operator === '/') opSymbol = '÷';
+      if (operator === '-') opSymbol = '−';
+
+      history.innerText = `${previousInput} ${opSymbol} ${currentInput} =`;
+      currentInput = String(result);
+      
+      // Pembulatan angka desimal panjang
+      if (typeof result === 'number' && !Number.isInteger(result)) {
+        currentInput = String(Math.round(result * 100000) / 100000);
+      }
+
+      operator = null;
+      shouldResetDisplay = true;
+      updateDisplay();
+
+      // Tambah kuota hitungan jika belum VIP
+      if (!isVip && !isChain) {
+        calculationCount++;
+        const remaining = Math.max(0, MAX_FREE_CALCS - calculationCount);
+        usesLeftDisplay.innerText = remaining;
+
+        if (calculationCount >= MAX_FREE_CALCS) {
+          setTimeout(() => {
+            triggerPaywall('Kamu telah mencapai batas 3x hitungan gratis.');
+          }, 400);
         }
-      } catch (err) {
-        console.warn('Camera access denied or error:', err);
-        // Will use Screen Torch fallback
       }
     }
 
-    // Initialize Camera on first user interaction or load
-    initCameraTorch();
-
-    // Toggle Torch Function
-    async function toggleTorch() {
-      // Check Paywall Limit if not VIP
-      if (!isVipUnlocked && toggleCount >= MAX_FREE_TOGGLES) {
-        showPaywallModal(
-          "Kuota Senter Gratis Habis!", 
-          "Kamu telah mencapai batas 2 kali nyala gratis. Beli akses VIP Premium seharga Rp 100.000 untuk menyalakan senter sepuasnya."
-        );
+    function triggerPaywallFeature(featureName) {
+      if (isVip) {
+        alert(`Fitur ${featureName} aktif!`);
         return;
       }
-
-      isTorchOn = !isTorchOn;
-
-      if (isTorchOn) {
-        if (!isVipUnlocked) {
-          toggleCount++;
-          updateUsageUI();
-        }
-        await turnOnHardwareOrScreenTorch();
-      } else {
-        await turnOffHardwareAndScreenTorch();
-      }
-
-      updatePowerButtonUI();
+      triggerPaywall(`Fitur premium <strong>${featureName}</strong> hanya tersedia untuk pengguna CalcPro VIP.`);
     }
 
-    // Turn ON Hardware Torch or Screen Overlay
-    async function turnOnHardwareOrScreenTorch() {
-      let hardwareSuccess = false;
-
-      if (isHardwareTorchSupported && imageCaptureTrack) {
-        try {
-          await imageCaptureTrack.applyConstraints({
-            advanced: [{ torch: true }]
-          });
-          hardwareSuccess = true;
-        } catch (e) {
-          console.error("Failed to apply hardware torch:", e);
-        }
-      }
-
-      // If hardware torch not available or failed, fallback to Bright Screen
-      if (!hardwareSuccess) {
-        screenTorchOverlay.classList.remove('opacity-0');
-        screenTorchOverlay.classList.add('opacity-100');
-        showToast("Mode Senter Layar Terang Aktif");
-      } else {
-        showToast("Senter HP Menyala!");
-      }
+    function triggerPaywall(customMessage) {
+      modalDesc.innerHTML = customMessage || 'Tingkatkan ke CalcPro VIP seharga Rp 100.000 untuk menikmati akses kalkulator tanpa batas.';
+      openModal();
     }
 
-    // Turn OFF Hardware & Screen Torch
-    async function turnOffHardwareAndScreenTorch() {
-      if (isHardwareTorchSupported && imageCaptureTrack) {
-        try {
-          await imageCaptureTrack.applyConstraints({
-            advanced: [{ torch: false }]
-          });
-        } catch (e) {
-          console.error("Failed to turn off hardware torch:", e);
-        }
-      }
-
-      screenTorchOverlay.classList.remove('opacity-100');
-      screenTorchOverlay.classList.add('opacity-0');
-    }
-
-    // Update UI Elements when Torch Toggles
-    function updatePowerButtonUI() {
-      if (isTorchOn) {
-        powerBtn.classList.add('power-btn-active', 'border-amber-400');
-        powerBtn.classList.remove('border-slate-700/60');
-        powerIconWrapper.classList.add('bg-amber-400', 'text-slate-950', 'shadow-lg', 'shadow-amber-400/50');
-        powerIconWrapper.classList.remove('bg-slate-800', 'text-slate-500');
-        powerStatusText.innerText = "NYALA";
-        powerStatusText.classList.add('text-amber-400');
-        powerStatusText.classList.remove('text-slate-400');
-        glowRing.classList.remove('opacity-0');
-        glowRing.classList.add('opacity-100');
-      } else {
-        powerBtn.classList.remove('power-btn-active', 'border-amber-400');
-        powerBtn.classList.add('border-slate-700/60');
-        powerIconWrapper.classList.remove('bg-amber-400', 'text-slate-950', 'shadow-lg', 'shadow-amber-400/50');
-        powerIconWrapper.classList.add('bg-slate-800', 'text-slate-500');
-        powerStatusText.innerText = "MATI";
-        powerStatusText.classList.remove('text-amber-400');
-        powerStatusText.classList.add('text-slate-400');
-        glowRing.classList.remove('opacity-100');
-        glowRing.classList.add('opacity-0');
-      }
-    }
-
-    // Update Usage Counter Progress Bar & UI
-    function updateUsageUI() {
-      const remaining = Math.max(0, MAX_FREE_TOGGLES - toggleCount);
-      usageText.innerText = `${toggleCount} dari ${MAX_FREE_TOGGLES} kali`;
-      
-      const percentage = (toggleCount / MAX_FREE_TOGGLES) * 100;
-      usageProgressBar.style.width = `${Math.min(100, percentage)}%`;
-
-      if (toggleCount >= MAX_FREE_TOGGLES) {
-        usageText.innerText = "KUOTA HABIS!";
-        usageText.classList.remove('text-amber-400');
-        usageText.classList.add('text-rose-500');
-        usageProgressBar.classList.remove('from-amber-500', 'to-yellow-400');
-        usageProgressBar.classList.add('bg-rose-500');
-        usageNote.innerText = "Senter terkunci. Silakan upgrade ke VIP Premium.";
-        usageNote.classList.add('text-rose-400');
-      }
-    }
-
-    // Show Paywall Modal
-    function showPaywallModal(title, description) {
-      if (title) modalTitle.innerText = title;
-      if (description) modalDescription.innerText = description;
-
-      paywallModal.classList.remove('opacity-0', 'pointer-events-none');
-      const innerCard = paywallModal.querySelector('div');
-      innerCard.classList.remove('translate-y-full');
-    }
-
-    // Hide Paywall Modal
-    function hidePaywallModal() {
-      const innerCard = paywallModal.querySelector('div');
-      innerCard.classList.add('translate-y-full');
+    function openModal() {
+      modal.classList.remove('hidden');
       setTimeout(() => {
-        paywallModal.classList.add('opacity-0', 'pointer-events-none');
-      }, 200);
+        modal.classList.remove('opacity-0');
+      }, 10);
     }
 
-    // Handle Brightness Slider Gimmick
-    brightnessSlider.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
-
-      if (!isVipUnlocked && val > 1) {
-        // Reset slider back to level 1
-        brightnessSlider.value = 1;
-        brightnessValueText.innerText = "Level 1 (Basic)";
-
-        // Show Paywall Modal for Brightness Feature
-        showPaywallModal(
-          "Fitur Kecerahan Terkunci!",
-          "Mode Kecerahan Level 2 hingga MAX (Super Terang) hanya tersedia untuk Pengguna VIP Premium (Rp 100.000)."
-        );
-      } else if (isVipUnlocked) {
-        brightnessValueText.innerText = `Level ${val} ${val === 5 ? '(MAX POWER ⚡)' : '(VIP)'}`;
-        showToast(`Tingkat Kecerahan Diatur ke Level ${val}`);
-      }
-    });
-
-    // Handle Buy VIP Click -> Trigger Fake Payment Process
-    buyVipBtn.addEventListener('click', () => {
-      hidePaywallModal();
-
-      // Show Payment Process Modal
-      paymentModal.classList.remove('opacity-0', 'pointer-events-none');
-      paymentLoadingState.classList.remove('hidden');
-      paymentSuccessState.classList.add('hidden');
-
-      // Simulate Payment Delay (2 seconds)
+    function closeModal() {
+      modal.classList.add('opacity-0');
       setTimeout(() => {
-        paymentLoadingState.classList.add('hidden');
-        paymentSuccessState.classList.remove('hidden');
-      }, 2200);
-    });
+        modal.classList.add('hidden');
+      }, 300);
+    }
 
-    // Finish Payment & Grant Unlimited VIP Access
-    finishPaymentBtn.addEventListener('click', () => {
-      paymentModal.classList.add('opacity-0', 'pointer-events-none');
-      
-      // Unlock VIP Status
-      isVipUnlocked = true;
-
-      // Update UI for VIP Status
-      vipBadge.classList.remove('bg-slate-800/80', 'border-slate-700', 'text-slate-400');
-      vipBadge.classList.add('bg-amber-400', 'border-amber-300', 'text-slate-950', 'shadow-md', 'shadow-amber-400/30');
-      vipBadgeText.innerText = "VIP UNLOCKED";
-
-      // Hide Usage Limit Card
-      usageTrackerCard.innerHTML = `
-        <div class="flex items-center justify-center gap-2 text-xs font-bold text-amber-400 py-1">
-          <i data-lucide="sparkles" class="w-4 h-4 fill-current"></i>
-          <span>AKSES VIP PREMIUM AKTIF - TANPA BATAS</span>
-        </div>
-      `;
-      usageTrackerCard.classList.remove('bg-slate-900/60');
-      usageTrackerCard.classList.add('bg-amber-500/10', 'border-amber-500/30');
-
-      showToast("Selamat! Akses VIP Senter Berhasil Diaktifkan 🎉");
-    });
-
-    // Toast Utility
-    function showToast(message) {
-      toastMessage.innerText = message;
-      toast.classList.remove('opacity-0', 'pointer-events-none');
-      toast.classList.add('opacity-100');
+    function processPayment() {
+      const payBtn = document.getElementById('pay-btn');
+      payBtn.disabled = true;
+      payBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses Pembayaran...`;
 
       setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2500);
+        isVip = true;
+        closeModal();
+
+        // Update Badge VIP UI
+        const badge = document.getElementById('vip-badge');
+        badge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center gap-1.5";
+        badge.innerHTML = `<i class="fa-solid fa-crown text-amber-400"></i> PRO VIP`;
+
+        // Update Limit Counter UI
+        const limitCounter = document.getElementById('limit-counter');
+        limitCounter.className = "text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-bold";
+        limitCounter.innerHTML = `<i class="fa-solid fa-infinite"></i> Unlimited VIP`;
+
+        alert('🎉 Pembayaran Berhasil! CalcPro VIP telah diaktifkan.');
+      }, 1500);
     }
-
-    // Event Listeners
-    powerBtn.addEventListener('click', toggleTorch);
-    closeOverlayBtn.addEventListener('click', async () => {
-      isTorchOn = false;
-      await turnOffHardwareAndScreenTorch();
-      updatePowerButtonUI();
-    });
-
-    closeModalBtn.addEventListener('click', hidePaywallModal);
-
-    // Close Modal when clicking background overlay
-    paywallModal.addEventListener('click', (e) => {
-      if (e.target === paywallModal) hidePaywallModal();
-    });
-
   </script>
 </body>
 </html>
